@@ -1,5 +1,5 @@
 {
-  "dev-lang": ["python"],
+  "dev-tools": ["python"],
   "memory": "4096",
   "disksize": "50GB",
   "ip_address": "192.168.33.10",

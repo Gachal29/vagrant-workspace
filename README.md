@@ -6,7 +6,7 @@ git clone git@github.com:Gachal29/vagrant-workspace.git {workcpace_name}
 ```
 
 ## vm環境の構築
-config.jsonをカスタマイズする場合、`example.config.json`をコピーし`config.json`を修正する。
+`example.config.json`をコピーし`config.json`を変更し、環境をカスタマイズする。
 ```
 cd workspace
 cp example.config.json config.json
