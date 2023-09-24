@@ -18,20 +18,7 @@ end
 puts "[config]"
 puts workspace_config
 
-Vagrant.configure("2") do |config|
-    config.vm.box = "ubuntu/jammy64"
-    config.vm.network "private_network", ip: workspace_config["ip_address"]
-    config.vm.network "forwarded_port", guest: 22, host: workspace_config["forwarded_port"], id: "ssh"
-    config.vm.provider :virtualbox do |vb|
-        vb.memory = workspace_config["memory"]
-    end
-    config.ssh.forward_agent = true
-    config.disksize.size = workspace_config["disksize"]
-
-    if workspace_config["synced_folder_host"] && workspace_config["synced_folder_guest"]
-        config.vm.synced_folder workspace_config["synced_folder_host"], workspace_config["synced_folder_guest"]
-    end
-
+def common_script config
     config.vm.provision :shell, inline: <<-EOS
         export DEBIAN_FRONTEND=noninteractive
         apt-get update
@@ -43,9 +30,6 @@ Vagrant.configure("2") do |config|
             gnupg-agent \
             software-properties-common \
             sudo
-        
-        # Add deadsnakes repository
-        add-apt-repository -y ppa:deadsnakes/ppa
 
         # Add NodeJS repository
         curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -73,18 +57,6 @@ Vagrant.configure("2") do |config|
 
         # Set timezone
         timedatectl set-timezone Asia/Tokyo
-
-        # Python development
-        apt-get install -y \
-            python3.9 \
-            python3.9-dev \
-            python3.9-venv \
-            python3.10 \
-            python3.10-dev \
-            python3.10-venv \
-            python3.11 \
-            python3.11-dev \
-            python3.11-venv
 
         # NodeJS development
         apt-get install -y nodejs
@@ -140,11 +112,44 @@ Vagrant.configure("2") do |config|
             wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -O /tmp/ngrok-v3-stable-linux-amd64.tgz
             tar xvzf /tmp/ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin/
         fi
-
-        # end
-        echo finish provision
     EOS
+end
 
-    config.vm.provision :shell, :path => "./scripts/git-completion-settings.sh"
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/jammy64"
+    config.vm.network "private_network", ip: workspace_config["ip_address"]
+    config.vm.network "forwarded_port", guest: 22, host: workspace_config["forwarded_port"], id: "ssh"
+    config.vm.provider :virtualbox do |vb|
+        vb.memory = workspace_config["memory"]
+    end
+    config.ssh.forward_agent = true
+    config.disksize.size = workspace_config["disksize"]
+
+    if workspace_config["synced_folder_host"] && workspace_config["synced_folder_guest"]
+        config.vm.synced_folder workspace_config["synced_folder_host"], workspace_config["synced_folder_guest"]
+    end
+
+    common_script(config)
+
+    if workspace_config["dev-lang"].include?("python")
+        config.vm.provision :shell, inline: <<-EOS
+            # Add deadsnakes repository
+            add-apt-repository -y ppa:deadsnakes/ppa
+
+            # Python development
+            apt-get install -y \
+                python3.9 \
+                python3.9-dev \
+                python3.9-venv \
+                python3.10 \
+                python3.10-dev \
+                python3.10-venv \
+                python3.11 \
+                python3.11-dev \
+                python3.11-venv
+        EOS
+    end
+
+    config.vm.provision :shell, inline: 'echo "finish provision"'
 end
 
