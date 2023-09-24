@@ -34,12 +34,6 @@ def common_script config
         # Add NodeJS repository
         curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 
-        # Add Docker repository
-        install -m 0755 -d /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        chmod a+r /etc/apt/keyrings/docker.gpg
-        echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
         # Update package list
         apt-get install --allow-unauthenticated
         
@@ -90,22 +84,6 @@ def common_script config
         apt-get install -y \
             redis-server \
             redis-tools
-        
-        # Docker
-        apt-get install -y \
-            docker-ce \
-            docker-ce-cli \
-            containerd.io \
-            docker-buildx-plugin \
-            docker-compose-plugin
-        groupadd -f docker
-        usermod -aG docker vagrant
-
-        # check docker enabled
-        systemctl list-unit-files --state=enabled | grep docker
-        if [ $? = 1 ]; then
-            systemctl enable containerd.service
-        fi
 
         # ngrok
         if [ ! -e /usr/local/bin/ngrok ]; then
