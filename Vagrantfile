@@ -113,6 +113,7 @@ Vagrant.configure("2") do |config|
         config.vm.provision :shell, inline: <<-EOS
             # Add deadsnakes repository
             add-apt-repository -y ppa:deadsnakes/ppa
+            apt-get update
 
             # Python development
             apt-get install -y \
