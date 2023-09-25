@@ -3,71 +3,92 @@
 ## Vagrantfileをclone
 ```
 git clone git@github.com:Gachal29/vagrant-workspace.git {workcpace_name}
+cd workspace_name
 ```
 
-## vm環境の構築
-`example.config.json`をコピーし`config.json`を変更し、環境をカスタマイズする。
+## 設定ファイルの作成
 ```
-cd workspace
-cp example.config.json config.json
+cd config
+cp example.vagrant_config.json vagrant_config.json
 ```
 
-vmの起動
+### vagrant_config.json 構築環境に合わせて書き換える
+- dev_tools
+  - 開発に必要なツールを選択する
+    - pythonまたはpython3
+      - Python3.9, 3.10, 3.11を全てインストール
+    - python3.x
+      - xでバージョンを指定する。指定したバージョンのみインストールされる
+      - 3.9*, 3.10, 3.11
+    - nodejs*
+      - 18.x
+    - db*
+      - mysql 8.x
+      - sqlite3
+    - memcached
+    - redis
+    - ngrok
+    - docker
+  - *はデフォルトのconfigファイルでインストールされる
+- memory
+  - VMで使用可能なメモリ容量
+    - 2GB: 2048
+    - 4GB: 4096
+    - 6GB: 6144
+    - 8GB: 8192
+  - デフォルト：4096
+- disksize
+  - データの保存領域
+  - デフォルト：50GB
+  - プラグインのインストール
+    - `vagrant plugin install vagrant-disksize`
+- ip_address
+  - VMのローカルIP
+  - デフォルト：`192.168.33.10`
+- forwarded_port
+  - sshのポート番号
+  - デフォルト：2222
+- VMとホストの共有フォルダ
+  - 事前にホスト側にディレクトリを作成する必要がある
+  - synced_folder_host
+    - ホスト側のディレクトリを指定 (相対パス)
+    - デフォルト：null
+  - synced_folder_guest
+    - VM側のディレクトリを指定 (絶対パス)
+    - デフォルト：null
+  - Vagrantfileに記述していないScriptを実行
+    - before_external_script_paths
+      - `common_script`より前に実行するScriptファイルのパス
+    - after_external_script_paths
+      - `common_script`の後に実行するScriptファイルのパス
+      - デフォルト：`["./external_scripts/git_setting.sh"]`
+
+## External Script
+- Vagrantfileに記述していないScript
+  - インストール済みのソフトウェアをアンインストールするなどの処理を実装
+- ファイルの配置：`./external_scripts/`
+
+### Scripts
+- git_setting.sh
+  - git関連の設定を行う
+  - `config/example.git_config.json`から`config/git_config.json`を生成する
+  ```
+  cd config/
+  cp example.git_config.json git_config.json
+  ```
+  - username
+    - gitのユーザー名
+  - email
+    - gitのメールアドレス
+  - identity_filename
+    - 生成する公開鍵のファイル名
+
+## Vagrantマシンを起動
 ```
 vagrant up
 ```
 
-## git, githubの環境を構築
-鍵ファイル名は`git_id_rsa`とする。
+Vagrantfileを更新した後はprovisionを行う
 ```
-git config --global user.name "username"
-git config --global user.email "email@example.com"
-
-cd ~/.ssh
-ssh-keygen -t rsa -C "email@example.com"
-```
-
-`config`ファイルを作成し、編集する。
-```
-touch ~/.ssh/config
-```
-
-### configファイルの内容
-```
-Host git github.com
-  HostName github.com
-  IdentityFile ~/.ssh/git_id_rsa
-  User git
-```
-
-`~/.ssh/git_id_rsa.pub`（公開鍵）の内容をgithubへ登録する
-
-## vm-setting-toolsをcloneする
-```
-git clone git@github.com:Gachal29/vm-setting-tools.git
-```
-
-## vmへのssh接続設定
-workspaceのvagrantを起動した状態で以下を実行し、出力結果をホスト側のconfigファイルへ追記する
-```
-cd workspace
-vagrant ssh-config
-```
-
-### vagrant ssh-configの出力結果（例）
-`Host`の値を書き換える
-```
-Host default
-  HostName 127.0.0.1
-  User vagrant
-  Port 2222
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-  IdentityFile ~~~/private_key
-  IdentitiesOnly yes
-  LogLevel FATAL
-  ForwardAgent yes
-  PubkeyAcceptedKeyTypes +ssh-rsa
-  HostKeyAlgorithms +ssh-rsa
+vagrant up --provision
 ```
