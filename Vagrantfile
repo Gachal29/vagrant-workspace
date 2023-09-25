@@ -207,5 +207,11 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
+    if workspace_config["external_script_paths"]
+        for external_script_path in workspace_config["external_script_paths"] do
+            config.vm.provision :shell, :path => external_script_path
+        end
+    end
+
     config.vm.provision :shell, inline: 'echo "finish provision"'
 end
