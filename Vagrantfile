@@ -250,6 +250,20 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
+    if workspace_config["dev_tools"].include?("golang")
+        config.vm.provision :shell, inline: <<-EOS
+            echo "Start Golang Setting"
+
+            wget https://go.dev/dl/go1.21.1.linux-amd64.tar.gz
+            rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.1.linux-amd64.tar.gz
+            rm -f /home/vagrant/go1.21.1.linux-amd64.tar.gz
+            echo "export PATH=\$PATH:/usr/local/go/bin" >> /home/vagrant/.bashrc
+            . /home/vagrant/.bashrc
+
+            echo "Finish Golang Setting"
+        EOS
+    end
+
     if workspace_config["after_external_script_paths"]
         for external_script_path in workspace_config["after_external_script_paths"] do
             config.vm.provision :shell, :path => external_script_path
