@@ -3,3 +3,4 @@ config/*
 !config/
 !config/example.*.json
 !external_scripts/
+external_scripts/personal/
