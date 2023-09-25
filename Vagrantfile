@@ -18,7 +18,7 @@ end
 puts "[config]"
 puts workspace_config
 
-def common_script
+def common_script config
     puts "Start Common Settings"
 
     config.vm.provision :shell, inline: <<-EOS
@@ -65,7 +65,7 @@ def common_script
     puts "Finish Common Settings"
 end
 
-def python_setup dev_tools
+def python_setup config, dev_tools
     puts "Start Python Settings"
 
     config.vm.provision :shell, inline: <<-EOS
@@ -124,10 +124,10 @@ Vagrant.configure("2") do |config|
         config.vm.synced_folder workspace_config["synced_folder_host"], workspace_config["synced_folder_guest"]
     end
 
-    common_script()
+    common_script(config)
 
     if workspace_config["dev-tools"].any?{ |tool| tool.start_with?("python") }
-        python_setup(workspace_config["dev-tools"])
+        python_setup(config, workspace_config["dev-tools"])
     end
 
     if workspace_config["dev-tools"].include?("nodejs")
