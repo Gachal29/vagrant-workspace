@@ -19,9 +19,9 @@ puts "[config]"
 puts workspace_config
 
 def common_script config
-    puts "Start Common Settings"
-
     config.vm.provision :shell, inline: <<-EOS
+        echo "Start Common Settings"
+        
         export DEBIAN_FRONTEND=noninteractive
         apt-get update
         apt-get install -y \
@@ -60,54 +60,60 @@ def common_script config
         
         # Utility
         apt-get install -y gettext
-    EOS
 
-    puts "Finish Common Settings"
+        echo "Finish Common Settings"
+    EOS
 end
 
 def python_setup config, dev_tools
-    puts "Start Python Settings"
-
     config.vm.provision :shell, inline: <<-EOS
+        echo "Start Python Settings"
+
         # Add deadsnakes repository
         add-apt-repository -y ppa:deadsnakes/ppa
         apt-get update
     EOS
 
     if dev_tools.any?{ |tool| tool == "python3.9" || tool == "python" || tool == "python3" }
-        puts "Python3.9"
         config.vm.provision :shell, inline: <<-EOS
+            echo "Python3.9"
+
             apt-get install -y \
                 python3.9 \
                 python3.9-dev \
                 python3.9-venv
+            
+            echo "Finish Python3.9"
         EOS
-        puts "Finish"
     end
 
     if dev_tools.any?{ |tool| tool == "python3.10" || tool == "python" || tool == "python3" }
-        puts "Python3.10"
         config.vm.provision :shell, inline: <<-EOS
+            echo "Python3.10"
+
             apt-get install -y \
                 python3.10 \
                 python3.10-dev \
                 python3.10-venv
+            
+            echo "Finish Python3.10"
         EOS
-        puts "Finish"
     end
 
     if dev_tools.any?{ |tool| tool == "python3.11" || tool == "python" || tool == "python3" }
-        puts "Python3.11"
         config.vm.provision :shell, inline: <<-EOS
+            echo "Python3.11"
+
             apt-get install -y \
                 python3.11 \
                 python3.11-dev \
                 python3.11-venv
+            
+            echo "Finish Python3.11"
         EOS
-        puts "Finish"
     end
 
-    puts "Finish Python Settings"
+    config.vm.provision :shell, inline: "echo 'Finish Python Settings'"
 end
 
 Vagrant.configure("2") do |config|
@@ -131,21 +137,24 @@ Vagrant.configure("2") do |config|
     end
 
     if workspace_config["dev-tools"].include?("nodejs")
-        puts "Start NodeJS Settings"
         config.vm.provision :shell, inline: <<-EOS
+            echo "Start NodeJS Settings"
+
             # Add NodeJS repository
             curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 
             # NodeJS
             apt-get update
             apt-get install -y nodejs
+
+            echo "Finish NodeJS Settings"
         EOS
-        puts "Finish NodeJS Settings"
     end
 
     if workspace_config["dev-tools"].include?("db")
-        puts "Start DB Settings"
         config.vm.provision :shell, inline: <<-EOS
+            echo "Start DB Settings"
+
             # sqlite3
             apt-get install -y sqlite3
 
@@ -156,41 +165,47 @@ Vagrant.configure("2") do |config|
                 mysql-server \
                 mysql-client \
                 libmysqlclient-dev
+            
+            echo "Finish DB Settings"
         EOS
-        puts "Finish DB Settings"
     end
 
     if workspace_config["dev-tools"].include?("memcached")
-        puts "Start Memcached Settings"
         config.vm.provision :shell, inline: <<-EOS
+            echo "Start Memcached Settings"
+
             apt-get install -y \
                 memcached \
                 libmemcached-dev
+            
+            echo "Finish Memcached Settings"
         EOS
-        puts "Finish Memcached Settings"
     end
 
     if workspace_config["dev-tools"].include?("redis")
-        puts "Start Redis Settings"
         config.vm.provision :shell, inline: <<-EOS
+            echo "Start Redis Settings"
+
             apt-get install -y \
                 redis-server \
                 redis-tools
+            
+            echo "Finish Redis Settings"
         EOS
-        puts "Finish Redis Settings"
     end
 
     if workspace_config["dev-tools"].include?("ngrok")
-        puts "Start ngrok Settings"
         config.vm.provision :shell, inline: <<-EOS
+            echo "Start ngrok Settings"
+
             if [ ! -e /usr/local/bin/ngrok ]; then
                 wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -O /tmp/ngrok-v3-stable-linux-amd64.tgz
                 tar xvzf /tmp/ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin/
             fi
+
+            echo "Finish ngrok Settings"
         EOS
-        puts "Finish ngrok Settings"
     end
 
     config.vm.provision :shell, inline: 'echo "finish provision"'
 end
-
