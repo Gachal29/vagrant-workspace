@@ -6,18 +6,17 @@ GIT_USERNAME=$(jq -r '.username' /vagrant/config/git_config.json)
 GIT_EMAIL=$(jq -r '.email' /vagrant/config/git_config.json)
 IDENTITY_FILENAME=$(jq -r '.identity_filename' /vagrant/config/git_config.json)
 
-git config --global user.name "$GIT_USERNAME"
-git config --global user.name "$GIT_EMAIL"
+sudo -u vagrant git config --global user.name "$GIT_USERNAME"
+sudo -u vagrant git config --global user.email "$GIT_EMAIL"
 
 # Gitのデフォルトブランチ名をmainに変更する（Gitがアップデートされたら削除する）
-git config --global init.defaultBranch main
+sudo -u vagrant git config --global init.defaultBranch main
 
 # SSHKEYを生成
-ssh-keygen -t rsa -C "$GIT_EMAIL" -f "$HOME/.ssh/$IDENTITY_FILENAME" -N ""
+sudo -u vagrant ssh-keygen -t rsa -C "$GIT_EMAIL" -f /home/vagrant/.ssh/"$IDENTITY_FILENAME" -N ""
+cat /home/vagrant/.ssh/$IDENTITY_FILENAME.pub
 
-cat ~/.ssh/$IDENTITY_FILENAME.pub
-
-cat << EOF >> ~/.ssh/config
+cat > /home/vagrant/.ssh/config << EOF
 Host git github.com
   HostName github.com
   IdentityFile ~/.ssh/$IDENTITY_FILENAME
@@ -25,11 +24,11 @@ Host git github.com
 EOF
 
 # Git completion settings
-sudo mkdir /usr/local/etc/bash_completion.d
-sudo curl -o /usr/local/etc/bash_completion.d/git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-sudo curl -o /usr/local/etc/bash_completion.d/git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
+mkdir /usr/local/etc/bash_completion.d
+curl -o /usr/local/etc/bash_completion.d/git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+curl -o /usr/local/etc/bash_completion.d/git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
 
-cat << "EOF" >> ~/.bashrc
+cat << "EOF" >> /home/vagrant/.bashrc
 
 source /usr/local/etc/bash_completion.d/git-prompt.sh
 source /usr/local/etc/bash_completion.d/git-completion.bash
@@ -42,4 +41,4 @@ else
 fi
 EOF
 
-source ~/.bashrc
+. /home/vagrant/.bashrc
