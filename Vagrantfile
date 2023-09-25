@@ -116,6 +116,32 @@ def python_setup config, dev_tools
     config.vm.provision :shell, inline: "echo 'Finish Python Settings'"
 end
 
+def java_setup config, dev_tools
+    config.vm.provision :shell, inline: "echo 'Start Java Setting'"
+
+    if dev_tools.any?{ |tool| tool == "java8"}
+        config.vm.provision :shell, inline: <<-EOS
+            echo "Java8"
+
+            apt-get install -y \
+                openjdk-8-jre \
+                openjdk-8-jdk
+
+            echo "Finish Java8"
+        EOS
+    end
+
+    if dev_tools.any?{ |tool| tool == "java"}
+        config.vm.provision :shell, inline: <<-EOS
+            echo "Java latest"
+            apt-get install -y default-jdk
+            echo "Finish Java latest"
+        EOS
+    end
+
+    config.vm.provision :shell, inline: "echo 'Finish Java Settings'"
+end
+
 Vagrant.configure("2") do |config|
     config.vm.box = "ubuntu/jammy64"
     config.vm.network "private_network", ip: workspace_config["ip_address"]
@@ -262,6 +288,10 @@ Vagrant.configure("2") do |config|
 
             echo "Finish Golang Setting"
         EOS
+    end
+
+    if workspace_config["dev_tools"].any?{ |tool| tool.start_with?("java") }
+        java_setup(config, workspace_config["dev_tools"])
     end
 
     if workspace_config["after_external_script_paths"]
