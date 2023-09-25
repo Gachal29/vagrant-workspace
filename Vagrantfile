@@ -23,7 +23,7 @@ def common_script config
         echo "Start Common Settings"
         
         export DEBIAN_FRONTEND=noninteractive
-        apt-get update
+        apt-get update && apt-get upgrade -y
         apt-get install -y \
             curl \
             ca-certificates \
