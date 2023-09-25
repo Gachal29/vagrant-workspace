@@ -226,24 +226,24 @@ Vagrant.configure("2") do |config|
 
             # Docker
             apt-get install -y \
-            docker-ce \
-            docker-ce-cli \
-            containerd.io \
-            docker-buildx-plugin \
-            docker-compose-plugin
-            groupadd -f docker
-            usermod -aG docker vagrant
+                docker-ce \
+                docker-ce-cli \
+                containerd.io \
+                docker-buildx-plugin \
+                docker-compose-plugin
+                groupadd -f docker
+                usermod -aG docker vagrant
 
             # check docker enabled
             systemctl list-unit-files --state=enabled|grep docker
             if [ $? = 1 ]; then
-            systemctl enable docker.service
+                systemctl enable docker.service
             fi
 
             # check containerd enabled
             systemctl list-unit-files --state=enabled|grep containerd
             if [ $? = 1 ]; then
-            systemctl enable containerd.service
+                systemctl enable containerd.service
             fi
 
             echo "Finish Docker Settings"
