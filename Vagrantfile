@@ -1,8 +1,8 @@
 require "fileutils"
 require "json"
 
-CONFIG_FILE = "config.json"
-CONFIG_EXAMPLE = "example.config.json"
+CONFIG_FILE = "./config/vagrant_config.json"
+CONFIG_EXAMPLE = "./config/example.vagrant_config.json"
 
 if File.exist?(CONFIG_FILE)
     puts "Using %s" % [CONFIG_FILE]
@@ -130,6 +130,12 @@ Vagrant.configure("2") do |config|
         config.vm.synced_folder workspace_config["synced_folder_host"], workspace_config["synced_folder_guest"]
     end
 
+    if workspace_config["before_external_script_paths"]
+        for external_script_path in workspace_config["before_external_script_paths"] do
+            config.vm.provision :shell, :path => external_script_path
+        end
+    end
+
     common_script(config)
 
     if workspace_config["dev-tools"].any?{ |tool| tool.start_with?("python") }
@@ -207,8 +213,8 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
-    if workspace_config["external_script_paths"]
-        for external_script_path in workspace_config["external_script_paths"] do
+    if workspace_config["after_external_script_paths"]
+        for external_script_path in workspace_config["after_external_script_paths"] do
             config.vm.provision :shell, :path => external_script_path
         end
     end

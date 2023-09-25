@@ -1,10 +1,13 @@
 {
-  "dev-tools": ["python3.9"],
+  "dev-tools": ["python3.9", "nodejs", "db"],
   "memory": "4096",
   "disksize": "50GB",
   "ip_address": "192.168.33.10",
   "forwarded_port": 2222,
   "synced_folder_host": null,
   "synced_folder_guest": null,
-  "external_script_paths": []
+  "before_external_script_paths": [],
+  "after_external_script_paths": [
+    "./external_scripts/git_setting.sh"
+  ]
 }
