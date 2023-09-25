@@ -213,6 +213,43 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
+    if workspace_config["dev-tools"].include?("docker")
+        config.vm.provision :shell, inline: <<-EOS
+            echo "Start Docker Settings"
+
+            install -m 0755 -d /etc/apt/keyrings
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            chmod a+r /etc/apt/keyrings/docker.gpg
+            echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+            apt-get update --allow-unauthenticated
+
+            # Docker
+            apt-get install -y \
+            docker-ce \
+            docker-ce-cli \
+            containerd.io \
+            docker-buildx-plugin \
+            docker-compose-plugin
+            groupadd -f docker
+            usermod -aG docker vagrant
+
+            # check docker enabled
+            systemctl list-unit-files --state=enabled|grep docker
+            if [ $? = 1 ]; then
+            systemctl enable docker.service
+            fi
+
+            # check containerd enabled
+            systemctl list-unit-files --state=enabled|grep containerd
+            if [ $? = 1 ]; then
+            systemctl enable containerd.service
+            fi
+
+            echo "Finish Docker Settings"
+        EOS
+    end
+
     if workspace_config["after_external_script_paths"]
         for external_script_path in workspace_config["after_external_script_paths"] do
             config.vm.provision :shell, :path => external_script_path
