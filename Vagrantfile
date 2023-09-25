@@ -138,11 +138,11 @@ Vagrant.configure("2") do |config|
 
     common_script(config)
 
-    if workspace_config["dev-tools"].any?{ |tool| tool.start_with?("python") }
-        python_setup(config, workspace_config["dev-tools"])
+    if workspace_config["dev_tools"].any?{ |tool| tool.start_with?("python") }
+        python_setup(config, workspace_config["dev_tools"])
     end
 
-    if workspace_config["dev-tools"].include?("nodejs")
+    if workspace_config["dev_tools"].include?("nodejs")
         config.vm.provision :shell, inline: <<-EOS
             echo "Start NodeJS Settings"
 
@@ -157,7 +157,7 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
-    if workspace_config["dev-tools"].include?("db")
+    if workspace_config["dev_tools"].include?("db")
         config.vm.provision :shell, inline: <<-EOS
             echo "Start DB Settings"
 
@@ -176,7 +176,7 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
-    if workspace_config["dev-tools"].include?("memcached")
+    if workspace_config["dev_tools"].include?("memcached")
         config.vm.provision :shell, inline: <<-EOS
             echo "Start Memcached Settings"
 
@@ -188,7 +188,7 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
-    if workspace_config["dev-tools"].include?("redis")
+    if workspace_config["dev_tools"].include?("redis")
         config.vm.provision :shell, inline: <<-EOS
             echo "Start Redis Settings"
 
@@ -200,7 +200,7 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
-    if workspace_config["dev-tools"].include?("ngrok")
+    if workspace_config["dev_tools"].include?("ngrok")
         config.vm.provision :shell, inline: <<-EOS
             echo "Start ngrok Settings"
 
@@ -213,7 +213,7 @@ Vagrant.configure("2") do |config|
         EOS
     end
 
-    if workspace_config["dev-tools"].include?("docker")
+    if workspace_config["dev_tools"].include?("docker")
         config.vm.provision :shell, inline: <<-EOS
             echo "Start Docker Settings"
 
