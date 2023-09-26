@@ -4,6 +4,8 @@
   "disksize": "50GB",
   "ip_address": "192.168.33.10",
   "forwarded_port": 2222,
+  "language": "ja",
+  "timezone": "Asia/Tokyo",
   "synced_folder_host": null,
   "synced_folder_guest": null,
   "before_external_script_paths": [],

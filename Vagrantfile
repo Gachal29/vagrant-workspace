@@ -31,35 +31,32 @@ def common_script config
             gnupg \
             gnupg-agent \
             software-properties-common \
-            sudo
-        
-        # Generic development
-        apt-get install -y \
+            sudo \
             tree \
             zip \
             unzip \
             build-essential \
-            language-pack-ja-base \
-            language-pack-ja
-
-        # Japanese locale
-        update-locale LANG=ja_JP.UTF-8
-
-        # Set timezone
-        timedatectl set-timezone Asia/Tokyo
-
-        # Requirements AppEngine SDK
-        apt-get install -y \
             ca-certificates \
             curl \
             git \
-            wget \
-        
-        # Utility
-        apt-get install -y gettext
-
-        echo "Finish Common Settings"
+            wget
     EOS
+
+    if workspace_config["language"] == "ja"
+        config.vm.provision :shell, inline: <<-EOS
+            apt-get install -y 
+                language-pack-ja-base \
+                language-pack-ja
+            
+            update-locale LANG=ja_JP.UTF-8
+        EOS
+    end
+
+    if workspace_config["timezone"] == "Asia/Tokyo"
+        config.vm.provision :shell, inline: "timedatectl set-timezone Asia/Tokyo"
+    end
+
+    config.vm.provision :shell, inline: "echo 'Finish Common Settings'"
 end
 
 def python_setup config, dev_tools
