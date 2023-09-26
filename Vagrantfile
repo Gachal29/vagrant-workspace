@@ -32,9 +32,6 @@ def common_script config
             gnupg-agent \
             software-properties-common \
             sudo
-
-        # Update package list
-        apt-get install --allow-unauthenticated
         
         # Generic development
         apt-get install -y \
@@ -283,7 +280,7 @@ Vagrant.configure("2") do |config|
             wget https://go.dev/dl/go1.21.1.linux-amd64.tar.gz
             rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.1.linux-amd64.tar.gz
             rm -f /home/vagrant/go1.21.1.linux-amd64.tar.gz
-            echo "export PATH=\$PATH:/usr/local/go/bin" >> /home/vagrant/.bashrc
+            echo "\n# golang\nexport PATH=\$PATH:/usr/local/go/bin" >> /home/vagrant/.bashrc
             . /home/vagrant/.bashrc
 
             echo "Finish Golang Setting"
@@ -292,6 +289,17 @@ Vagrant.configure("2") do |config|
 
     if workspace_config["dev_tools"].any?{ |tool| tool.start_with?("java") }
         java_setup(config, workspace_config["dev_tools"])
+    end
+
+    if workspace_config["dev_tools"].include?("rust")
+        config.vm.provision :shell, inline: <<-EOS
+            echo "Start Rust Setting"
+            echo "\n# Rust" >> /home/vagrant/.bashrc
+            chown vagrant:vagrant /home/vagrant/.bashrc
+            sudo -u vagrant -i bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
+            . /home/vagrant/.bashrc
+            echo "Finish Rust Setting"
+        EOS
     end
 
     if workspace_config["after_external_script_paths"]
