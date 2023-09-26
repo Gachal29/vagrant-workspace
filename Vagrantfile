@@ -18,7 +18,7 @@ end
 puts "[config]"
 puts workspace_config
 
-def common_script config
+def common_script config, workspace_config
     config.vm.provision :shell, inline: <<-EOS
         echo "Start Common Settings"
         
@@ -155,7 +155,7 @@ Vagrant.configure("2") do |config|
         end
     end
 
-    common_script(config)
+    common_script(config, workspace_config)
 
     if workspace_config["dev_tools"].any?{ |tool| tool.start_with?("python") }
         python_setup(config, workspace_config["dev_tools"])
