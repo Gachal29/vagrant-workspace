@@ -37,7 +37,6 @@ def common_script config
             unzip \
             build-essential \
             ca-certificates \
-            curl \
             git \
             wget
     EOS
