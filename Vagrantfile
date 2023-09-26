@@ -43,7 +43,7 @@ def common_script config, workspace_config
 
     if workspace_config["language"] == "ja"
         config.vm.provision :shell, inline: <<-EOS
-            apt-get install -y 
+            apt-get install -y \
                 language-pack-ja-base \
                 language-pack-ja
             
